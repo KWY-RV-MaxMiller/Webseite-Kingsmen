@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b0c" />
+  <meta name="color-scheme" content="dark" />
+  <title>Kingsmen Lagerverwaltung</title>
+  <link rel="stylesheet" href="styles.css?v=1" />
+</head>
+<body>
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <div class="eyebrow">KINGSMEN • ONLINE</div>
+    <h2>Anmelden</h2>
+    <p class="auth-subtitle">Gib dein Zugangs-Passwort ein.</p>
+    <form id="passwordLoginForm" class="password-login-form">
+      <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Passwort" required />
+      <button class="password-login-button" type="submit" id="passwordLoginButton">Anmelden</button>
+    </form>
+    <div class="form-note" id="authMessage"></div>
+    <div class="auth-config-note">Kingsmen Lagerverwaltung</div>
+  </div>
+</div>
+</div>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">LAGER • VERWALTUNG</div>
+        <h1 id="pageTitle">Bestand</h1>
+      </div>
+      <div class="header-badge" id="currentWeekBadge">KW --</div>
+    </header>
+
+    <main class="content">
+      <section class="tab-panel active" data-panel="stock">
+        <div class="section-heading">
+          <div>
+            <div class="section-title">Produkte</div>
+            <div class="section-subtitle">Jeder Lagerbestand wird einzeln angezeigt. Der Bestand kann niemals unter 0 fallen. Wochenabgaben der aktuellen KW werden als Zugang im Schwarzgeldbestand verbucht; ältere KWs bleiben dokumentarisch.</div>
+          </div>
+        </div>
+        <div class="product-grid" id="stockGrid"></div>
+      </section>
+
+      <section class="tab-panel" data-panel="movement">
+        <div class="section-heading">
+          <div>
+            <div class="section-title">Bestand ändern</div>
+            <div class="section-subtitle">Produkt auswählen und Menge hinzufügen oder abziehen.</div>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <form id="movementForm">
+            <div class="field">
+              <label for="movementProduct">Produkt</label>
+              <select id="movementProduct" required></select>
+            </div>
+            <div class="field">
+              <label for="movementAmount">Menge</label>
+              <input id="movementAmount" class="number-input" type="text" inputmode="numeric" autocomplete="off" placeholder="z. B. 25.000" required />
+            </div>
+            <div class="field">
+              <label for="movementUser">Benutzer <span class="optional-label">optional</span></label>
+              <input id="movementUser" list="movementUserSuggestions" type="text" placeholder="z. B. Max Muster" autocomplete="off" />
+              <datalist id="movementUserSuggestions"></datalist>
+            </div>
+            <div class="movement-actions">
+              <button type="submit" class="action-button orange" data-action="add">＋ Hinzufügen</button>
+              <button type="submit" class="action-button dark" data-action="subtract">− Abziehen</button>
+            </div>
+          </form>
+          <div class="form-note">Der Benutzer ist optional. Beim Hinzufügen steigt der gewählte Produktbestand. Beim Abziehen darf der Bestand nicht unter 0 sinken.</div>
+        </div>
+
+        <div class="section-heading compact">
+          <div>
+            <div class="section-title">Letzte Änderungen</div>
+          </div>
+        </div>
+        <div class="activity-list" id="activityList"></div>
+      </section>
+
+      <section class="tab-panel" data-panel="weekly">
+        <div class="section-heading">
+          <div>
+            <div class="section-title">Wochenabgabe</div>
+            <div class="section-subtitle">Nur Schwarzgeld · Sollmenge 300.000. Für jedes Mitglied wird pro Kalenderwoche automatisch eine Abgabe angelegt; Nutzer mit der Endnummer 11 oder 12 sind ausgenommen. Bei der aktuellen KW erhöht eine abgegebene Menge den Schwarzgeld-Bestand; Abziehen reduziert ihn, niemals unter 0.</div>
+          </div>
+        </div>
+
+        <div class="status-legend">
+          <span><i class="dot green"></i> Abgegeben</span>
+          <span><i class="dot yellow"></i> Offen</span>
+          <span><i class="dot red"></i> Nicht abgegeben</span>
+        </div>
+
+        <div class="form-card weekly-form-card">
+          <form id="weeklyForm">
+            <input id="weeklyEditingId" type="hidden" />
+            <div class="field">
+              <label for="personName">Nutzer</label>
+              <input id="personName" list="userSuggestions" type="text" placeholder="Bestehenden Nutzer auswählen oder neuen Namen eingeben" autocomplete="off" required />
+              <datalist id="userSuggestions"></datalist>
+            </div>
+            <div class="fixed-details">
+              <div class="fixed-detail"><span>Produkt</span><strong>Schwarzgeld</strong></div>
+              <div class="fixed-detail"><span>Erforderlich</span><strong>300.000</strong></div>
+              <div class="fixed-detail"><span>Modus</span><strong id="weeklyModeLabel">Neuer Eintrag</strong></div>
+            </div>
+            <div class="field">
+              <label for="weeklyWeek">Kalenderwoche</label>
+              <select id="weeklyWeek" required></select>
+            </div>
+            <div class="field">
+              <label for="givenAmount">Menge</label>
+              <input id="givenAmount" class="number-input" type="text" inputmode="numeric" autocomplete="off" placeholder="z. B. 300.000" value="0" required />
+            </div>
+            <div class="movement-actions">
+              <button type="submit" class="action-button orange" data-weekly-action="add">＋ Hinzufügen</button>
+              <button type="submit" class="action-button dark" data-weekly-action="subtract">− Abziehen</button>
+            </div>
+            <div class="form-actions-row">
+              <button class="primary-button" type="button" id="weeklySaveButton">Eintrag speichern</button>
+              <button class="secondary-button hidden" type="button" id="weeklyCancelEdit">Bearbeitung abbrechen</button>
+            </div>
+          </form>
+          <div class="form-note">Bei einem neuen Eintrag startet die Menge bei 0. Mit „Hinzufügen“ oder „Abziehen“ wird die Menge für die ausgewählte Person und KW angepasst. Nur die aktuelle KW verändert den Schwarzgeld-Bestand: Hinzufügen erhöht ihn, Abziehen reduziert ihn. Der Bestand selbst fällt nie unter 0.</div>
+        </div>
+
+        <div class="section-heading compact">
+          <div>
+            <div class="section-title">Nutzer & Abgaben</div>
+            <div class="section-subtitle">Jeder Nutzer wird separat geführt. Die aktuelle KW wird auch ohne Eintrag als „Offen“ angezeigt. Jeder Eintrag kann einzeln bearbeitet oder gelöscht werden. Zusätzlich kann die gesamte Abgabe eines Nutzers entfernt werden.</div>
+          </div>
+        </div>
+        <div class="people-list" id="peopleList"></div>
+      </section>
+
+
+
+      <div class="attendance-modal hidden" id="weeklyUserModal">
+        <div class="attendance-modal-backdrop" data-close-weekly-user></div>
+        <div class="attendance-modal-card weekly-user-modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="eyebrow">WOCHENABGABE</div>
+              <h2 id="weeklyUserModalTitle">Nutzer</h2>
+            </div>
+            <button class="modal-close" type="button" data-close-weekly-user>×</button>
+          </div>
+
+          <div class="weekly-user-edit-row">
+            <div class="field">
+              <label for="weeklyUserNameInput">Nutzername</label>
+              <input id="weeklyUserNameInput" type="text" autocomplete="off" />
+            </div>
+            <button class="primary-button" type="button" id="weeklyUserRenameButton">Name speichern</button>
+            <button class="delete-button weekly-user-delete-button" type="button" id="weeklyUserDeleteButton">Nutzer löschen</button>
+          </div>
+
+          <div class="weekly-user-summary" id="weeklyUserSummary"></div>
+          <div class="weekly-user-history" id="weeklyUserHistory"></div>
+        </div>
+      </div>
+
+      <section class="tab-panel" data-panel="selling">
+        <div class="section-heading">
+          <div>
+            <div class="section-title">Verkaufen</div>
+            <div class="section-subtitle">Produkt auswählen, Mengen pro Nutzer eintragen und anschließend berechnen, wie viele Mulen oder Guardien benötigt werden.</div>
+          </div>
+        </div>
+
+        <div class="sell-product-grid" id="sellProductGrid"></div>
+
+      </section>
+
+      <div class="attendance-modal hidden" id="sellProductModal">
+        <div class="attendance-modal-backdrop" data-close-sell-product></div>
+        <div class="attendance-modal-card sell-modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="eyebrow">VERKAUFEN</div>
+              <h2 id="sellModalTitle">Produkt</h2>
+            </div>
+            <button class="modal-close" type="button" data-close-sell-product>×</button>
+          </div>
+
+          <form id="sellEntryForm">
+            <div class="field">
+              <label for="sellEntryUserButton">Nutzer</label>
+              <div class="sell-user-picker" id="sellUserPicker">
+                <input id="sellEntryUser" type="hidden" />
+                <button class="sell-user-picker-button" id="sellEntryUserButton" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="sellEntryUserSelected" class="sell-user-picker-placeholder">Mitglied auswählen</span>
+                  <span class="sell-user-picker-chevron">⌄</span>
+                </button>
+                <div class="sell-user-picker-menu hidden" id="sellEntryUserMenu" role="listbox"></div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="sellEntryAmount">Menge</label>
+              <input id="sellEntryAmount" class="number-input" type="text" inputmode="numeric" autocomplete="off" placeholder="z. B. 400" required />
+            </div>
+            <div class="form-actions-row">
+              <button class="primary-button" type="submit">Menge eintragen</button>
+              <button class="secondary-button" type="button" data-close-sell-product>Abbrechen</button>
+            </div>
+          </form>
+
+          <div class="sell-modal-total">
+            <span>Gesamt für dieses Produkt</span>
+            <strong id="sellModalTotal">0</strong>
+          </div>
+
+          <div class="sell-product-transport">
+            <div class="sell-product-transport-actions">
+              <button class="action-button orange" type="button" id="sellMuleButton">Mulen berechnen · 800 Platz</button>
+              <button class="action-button dark" type="button" id="sellGuardianButton">Guardien berechnen · 500 Platz</button>
+            </div>
+            <div class="sell-transport-result hidden" id="sellTransportResult"></div>
+          </div>
+
+          <div class="modal-section-title">Eingetragene Nutzer</div>
+          <div class="sell-entry-list" id="sellEntryList"></div>
+        </div>
+      </div>
+
+
+      <section class="tab-panel" data-panel="calendar">
+        <div class="calendar-shell">
+          <div class="section-heading calendar-heading">
+            <div>
+              <div class="section-title">Kalender</div>
+              <div class="section-subtitle">Wochenübersicht von Montag bis Sonntag · 18:00–24:00 Uhr · 30-Minuten-Blöcke.</div>
+            </div>
+            <button class="primary-button" type="button" id="calendarAddButton">Termin erstellen</button>
+          </div>
+          <div class="calendar-toolbar">
+            <button class="small-button" type="button" id="calendarPrevWeek">‹ Vorherige Woche</button>
+            <strong id="calendarWeekTitle"></strong>
+            <div class="calendar-toolbar-right">
+              <button class="small-button orange-small" type="button" id="calendarTodayButton">Diese Woche</button>
+              <button class="small-button" type="button" id="calendarNextWeek">Nächste Woche ›</button>
+            </div>
+          </div>
+          <div class="schedule-scroll"><div class="schedule-grid" id="calendarWeekGrid"></div></div>
+          <div class="calendar-readonly-note">Alle angemeldeten Nutzer können Termine sehen. Erstellen, bearbeiten und löschen kann nur die Lager-Rolle.</div>
+        </div>
+      </section>
+
+      <div class="attendance-modal hidden" id="calendarModal" role="dialog" aria-modal="true" aria-labelledby="calendarModalTitle">
+        <div class="attendance-modal-backdrop" data-close-calendar></div>
+        <div class="attendance-modal-card calendar-modal-card">
+          <div class="modal-title-row">
+            <div><div class="section-title" id="calendarModalTitle">Termin erstellen</div><div class="section-subtitle">Zeitraum 18:00–24:00 Uhr in 30-Minuten-Schritten.</div></div>
+            <button class="modal-close" type="button" data-close-calendar>×</button>
+          </div>
+          <form id="calendarForm" class="calendar-form">
+            <label>Titel<input id="calendarTitle" type="text" maxlength="80" required placeholder="z. B. Besprechung" /></label>
+            <label>Datum
+              <div class="lle-date-field">
+                <input id="calendarDate" type="hidden" required />
+                <button id="calendarDateButton" class="lle-date-button" type="button"><span id="calendarDateText">Datum auswählen</span><span aria-hidden="true">▦</span></button>
+                <div id="calendarDatePicker" class="lle-date-picker hidden" role="dialog" aria-label="Datum auswählen">
+                  <div class="lle-date-picker-head">
+                    <button type="button" class="lle-picker-nav" id="calendarDatePrev">‹</button>
+                    <strong id="calendarDateMonth"></strong>
+                    <button type="button" class="lle-picker-nav" id="calendarDateNext">›</button>
+                  </div>
+                  <div class="lle-date-weekdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
+                  <div id="calendarDateDays" class="lle-date-days"></div>
+                </div>
+              </div>
+            </label>
+            <div class="calendar-time-row">
+              <label>Von<select id="calendarStart" required>
+                <option>18:00</option><option>18:30</option><option>19:00</option><option>19:30</option><option>20:00</option><option>20:30</option><option>21:00</option><option>21:30</option><option>22:00</option><option>22:30</option><option>23:00</option><option>23:30</option>
+              </select></label>
+              <label>Bis<select id="calendarEnd" required>
+                <option>18:30</option><option>19:00</option><option>19:30</option><option>20:00</option><option>20:30</option><option>21:00</option><option>21:30</option><option>22:00</option><option>22:30</option><option>23:00</option><option>23:30</option><option>24:00</option>
+              </select></label>
+            </div>
+            <label>Notiz (optional)<textarea id="calendarNote" maxlength="300" rows="3" placeholder="Zusätzliche Informationen"></textarea></label>
+            <div class="form-actions-row calendar-form-actions">
+              <button class="primary-button" type="submit">Speichern</button>
+              <button class="secondary-button" type="button" data-close-calendar>Abbrechen</button>
+              <button class="danger-button" type="button" id="calendarDeleteButton" hidden>Termin löschen</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <section class="tab-panel" data-panel="members">
+        <div class="members-shell">
+          <div class="section-heading members-heading">
+            <div>
+              <div class="section-title">Mitglieder</div>
+              <div class="section-subtitle">Unabhängige Mitgliederliste mit optionaler Probezeit.</div>
+            </div>
+            <button class="primary-button" type="button" id="memberAddButton">＋ Mitglied hinzufügen</button>
+          </div>
+
+          <div class="members-content-grid">
+            <div class="members-card">
+              <div class="members-list-head">
+                <span>Mitglied</span>
+                <span>Status</span>
+              </div>
+              <div class="members-list" id="membersList"></div>
+            </div>
+
+            <aside class="member-legend-card">
+              <div class="member-legend-header">
+                <div>
+                  <div class="eyebrow">RÄNGE</div>
+                  <h3>Legende</h3>
+                </div>
+                <button class="small-button orange-small" type="button" id="memberLegendEditButton">Anpassen</button>
+              </div>
+              <div class="member-legend-list" id="memberLegendList"></div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <div class="attendance-modal hidden" id="memberLegendModal">
+        <div class="attendance-modal-backdrop" data-close-member-legend></div>
+        <div class="attendance-modal-card member-legend-modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="eyebrow">MITGLIEDER</div>
+              <h2>Legende anpassen</h2>
+            </div>
+            <button class="modal-close" type="button" data-close-member-legend>×</button>
+          </div>
+
+          <form id="memberLegendForm">
+            <div class="member-legend-form-grid">
+              <div class="field">
+                <label for="memberLegendRank">Zahl / Rang</label>
+                <input id="memberLegendRank" type="text" maxlength="12" inputmode="numeric" placeholder="z. B. 12" required />
+              </div>
+              <div class="field">
+                <label for="memberLegendDescription">Bedeutung</label>
+                <input id="memberLegendDescription" type="text" maxlength="120" placeholder="z. B. Rangname oder Erklärung" required />
+              </div>
+            </div>
+            <div class="form-actions-row">
+              <button class="primary-button" type="submit" id="memberLegendSaveButton">Eintrag hinzufügen</button>
+              <button class="secondary-button hidden" type="button" id="memberLegendCancelEdit">Bearbeiten abbrechen</button>
+            </div>
+          </form>
+
+          <div class="modal-section-title">Legendeneinträge</div>
+          <div class="member-legend-editor-list" id="memberLegendEditorList"></div>
+        </div>
+      </div>
+
+      <div class="attendance-modal hidden" id="memberModal">
+        <div class="attendance-modal-backdrop" data-close-member></div>
+        <div class="attendance-modal-card member-modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="eyebrow">MITGLIEDER</div>
+              <h2 id="memberModalTitle">Mitglied hinzufügen</h2>
+            </div>
+            <button class="modal-close" type="button" data-close-member>×</button>
+          </div>
+
+          <form id="memberForm">
+            <div class="field">
+              <label for="memberName">Name / Rang</label>
+              <input id="memberName" type="text" maxlength="100" autocomplete="off" placeholder="z. B. Kevin 15" required />
+            </div>
+            <div class="field">
+              <label for="memberProbationEnd">Probezeit bis <span class="optional-label">(optional)</span></label>
+              <input id="memberProbationEnd" type="date" />
+            </div>
+            <div class="field">
+              <label for="memberProbationStatusButton">Probezeit-Status</label>
+              <input id="memberProbationStatus" type="hidden" value="auto" />
+              <button class="member-status-picker-button" type="button" id="memberProbationStatusButton">
+                <span id="memberProbationStatusButtonText">Automatisch nach Datum</span>
+                <span class="member-status-picker-chevron">›</span>
+              </button>
+              <div class="form-note">Bei „Automatisch“ wechselt der Status nach Ablauf des Datums selbstständig auf Bestanden. Aktiv, Bestanden oder Entfällt können jederzeit manuell gesetzt werden.</div>
+            </div>
+
+            <div class="field">
+              <label for="memberDescription">Beschreibung <span class="optional-label">(optional)</span></label>
+              <textarea id="memberDescription" class="member-description-input" maxlength="1500" rows="5" placeholder="Notizen oder Beschreibung zum Mitglied …"></textarea>
+            </div>
+
+            <div class="form-actions-row">
+              <button class="primary-button" type="submit" id="memberSaveButton">Speichern</button>
+              <button class="secondary-button" type="button" data-close-member>Abbrechen</button>
+              <button class="delete-button member-delete-modal hidden" type="button" id="memberDeleteButton">Mitglied löschen</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="attendance-modal hidden" id="memberStatusModal">
+        <div class="attendance-modal-backdrop" data-close-member-status></div>
+        <div class="attendance-modal-card member-status-modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="eyebrow">PROBEZEIT</div>
+              <h2>Status auswählen</h2>
+            </div>
+            <button class="modal-close" type="button" data-close-member-status>×</button>
+          </div>
+
+          <div class="member-status-options">
+            <button type="button" class="member-status-option auto" data-member-status-value="auto">
+              <span class="member-status-dot"></span>
+              <span>
+                <strong>Automatisch nach Datum</strong>
+                <small>Bis zum Datum aktiv, danach automatisch bestanden.</small>
+              </span>
+              <span class="member-status-check">✓</span>
+            </button>
+
+            <button type="button" class="member-status-option active" data-member-status-value="active">
+              <span class="member-status-dot"></span>
+              <span>
+                <strong>Aktiv</strong>
+                <small>Probezeit bleibt manuell aktiv.</small>
+              </span>
+              <span class="member-status-check">✓</span>
+            </button>
+
+            <button type="button" class="member-status-option passed" data-member-status-value="passed">
+              <span class="member-status-dot"></span>
+              <span>
+                <strong>Bestanden</strong>
+                <small>Probezeit manuell als bestanden markieren.</small>
+              </span>
+              <span class="member-status-check">✓</span>
+            </button>
+
+            <button type="button" class="member-status-option waived" data-member-status-value="waived">
+              <span class="member-status-dot"></span>
+              <span>
+                <strong>Entfällt</strong>
+                <small>Für dieses Mitglied entfällt die Probezeit.</small>
+              </span>
+              <span class="member-status-check">✓</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <section class="tab-panel" data-panel="sanctions">
+        <div class="sanctions-shell">
+          <div class="section-heading sanctions-heading">
+            <div>
+              <div class="section-title">Sanktionen</div>
+              <div class="section-subtitle">Mitglieder aus der Mitgliederliste, offene Sanktionen und zentraler Sanktionskatalog.</div>
+            </div>
+          </div>
+
+          <section class="sanctions-open-card">
+            <div class="sanctions-card-head">
+              <div>
+                <div class="eyebrow">ÜBERSICHT</div>
+                <h3>Offene Sanktionen</h3>
+              </div>
+              <span class="sanctions-open-count" id="sanctionsOpenCount">0 offen</span>
+            </div>
+            <div class="sanctions-open-list" id="sanctionsOpenList"></div>
+          </section>
+
+          <div class="sanctions-content-grid">
+            <section class="sanctions-users-card">
+              <div class="sanctions-card-head">
+                <div>
+                  <div class="eyebrow">MITGLIEDER</div>
+                  <h3>User</h3>
+                </div>
+              </div>
+              <div class="sanctions-user-list" id="sanctionsUserList"></div>
+            </section>
+
+            <aside class="sanctions-catalog-card">
+              <div class="sanctions-card-head">
+                <div>
+                  <div class="eyebrow">KATALOG</div>
+                  <h3>Sanktionskatalog</h3>
+                </div>
+                <button class="small-button orange-small" type="button" id="sanctionCatalogEditButton">Anpassen</button>
+              </div>
+              <div class="sanctions-catalog-list" id="sanctionsCatalogList"></div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <div class="attendance-modal hidden" id="sanctionUserModal">
+        <div class="attendance-modal-backdrop" data-close-sanction-user></div>
+        <div class="attendance-modal-card sanction-user-modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="eyebrow">SANKTIONEN</div>
+              <h2 id="sanctionUserModalTitle">Mitglied</h2>
+            </div>
+            <button class="modal-close" type="button" data-close-sanction-user>×</button>
+          </div>
+
+          <div class="sanction-user-summary">
+            <div>
+              <span>Offener Gesamtbetrag</span>
+              <strong id="sanctionUserOpenTotal">0</strong>
+            </div>
+            <button class="primary-button" type="button" id="sanctionCreateButton">＋ Sanktion erstellen</button>
+          </div>
+
+          <div class="modal-section-title">Offene Sanktionen</div>
+          <div class="sanction-user-open-list" id="sanctionUserOpenList"></div>
+        </div>
+      </div>
+
+      <div class="attendance-modal hidden" id="sanctionAssignModal">
+        <div class="attendance-modal-backdrop" data-close-sanction-assign></div>
+        <div class="attendance-modal-card sanction-assign-modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="eyebrow">SANKTION</div>
+              <h2 id="sanctionAssignModalTitle">Sanktion erstellen</h2>
+            </div>
+            <button class="modal-close" type="button" data-close-sanction-assign>×</button>
+          </div>
+          <div class="form-note sanction-assign-member" id="sanctionAssignMember"></div>
+          <div class="sanction-picker-list" id="sanctionPickerList"></div>
+        </div>
+      </div>
+
+      <div class="attendance-modal hidden" id="sanctionCatalogModal">
+        <div class="attendance-modal-backdrop" data-close-sanction-catalog></div>
+        <div class="attendance-modal-card sanction-catalog-modal-card">
+          <div class="modal-header">
+            <div>
+              <div class="eyebrow">SANKTIONEN</div>
+              <h2>Sanktionskatalog anpassen</h2>
+            </div>
+            <button class="modal-close" type="button" data-close-sanction-catalog>×</button>
+          </div>
+
+          <form id="sanctionCatalogForm">
+            <div class="sanction-catalog-form-grid">
+              <div class="field">
+                <label for="sanctionCatalogTitle">Sanktion</label>
+                <input id="sanctionCatalogTitle" type="text" maxlength="100" placeholder="z. B. Regelverstoß" required />
+              </div>
+              <div class="field sanction-amounts-field">
+                <div class="sanction-amounts-field-head">
+                  <label>Höhe der Sanktion</label>
+                  <button class="small-button orange-small" type="button" id="sanctionCatalogAddAmount">＋ Betrag</button>
+                </div>
+                <div class="sanction-catalog-amounts-editor" id="sanctionCatalogAmountsEditor"></div>
+                <div class="form-note">Du kannst mehrere einzelne Strafhöhen hinterlegen, z. B. 50.000, 55.000 und 100.000. Beim Verteilen wählst du eine davon aus.</div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="sanctionCatalogDescription">Beschreibung</label>
+              <textarea id="sanctionCatalogDescription" class="member-description-input sanction-catalog-description" maxlength="1500" rows="5" placeholder="Ausführliche Beschreibung der Sanktion …" required></textarea>
+            </div>
+            <div class="form-actions-row">
+              <button class="primary-button" type="submit" id="sanctionCatalogSaveButton">Eintrag hinzufügen</button>
+              <button class="secondary-button hidden" type="button" id="sanctionCatalogCancelEdit">Bearbeiten abbrechen</button>
+            </div>
+          </form>
+
+          <div class="modal-section-title">Katalogeinträge</div>
+          <div class="sanction-catalog-editor-list" id="sanctionCatalogEditorList"></div>
+        </div>
+      </div>
+
+
+      <section class="tab-panel" data-panel="minimum-cars">
+        <div class="minimum-cars-shell">
+          <div class="section-heading minimum-cars-heading">
+            <div>
+              <div class="section-title">Mindestbestand - Autos</div>
+              <div class="section-subtitle">Tägliche Kofferraum-Kontrolle für alle Mitglieder.</div>
+            </div>
+            <div class="minimum-cars-date-nav">
+              <button class="small-button" type="button" id="minimumCarsWeekOverviewButton">Wochenansicht</button>
+              <button class="small-button" type="button" id="minimumCarsPrevDay">‹</button>
+              <input type="date" id="minimumCarsDate" />
+              <button class="small-button" type="button" id="minimumCarsToday">Heute</button>
+              <button class="small-button" type="button" id="minimumCarsNextDay">›</button>
+            </div>
+          </div>
+
+          <div class="minimum-cars-requirements">
+            <span><strong>5</strong> Medkits</span>
+            <span><strong>5</strong> Repairkits</span>
+            <span><strong>5</strong> Seile</span>
+            <span><strong>3</strong> Säcke</span>
+            <span><strong>min. 250</strong> Schuss kurze Munition</span>
+          </div>
+
+          <div class="minimum-cars-card">
+            <div class="minimum-cars-list-head">
+              <span>Mitglied</span>
+              <span>5 Medkits</span>
+              <span>5 Repairkits</span>
+              <span>5 Seile</span>
+              <span>3 Säcke</span>
+              <span>250 Kurz-Munition</span>
+              <span>Strafe</span>
+            </div>
+            <div class="minimum-cars-list" id="minimumCarsList"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="attendance-modal hidden" id="minimumCarsPenaltyModal">
+        <div class="attendance-modal-backdrop" data-close-minimum-cars-penalty></div>
+        <div class="attendance-modal-card minimum-cars-penalty-card">
+          <div class="modal-header">
+            <div>
+              <div class="eyebrow">MINDESTBESTAND - AUTOS</div>
+              <h2 id="minimumCarsPenaltyTitle">Strafe verteilen</h2>
+            </div>
+            <button class="modal-close" type="button" data-close-minimum-cars-penalty>×</button>
+          </div>
+
+          <div class="minimum-cars-penalty-info" id="minimumCarsPenaltyInfo"></div>
+
+          <div class="minimum-cars-penalty-options">
+            <button type="button" class="minimum-cars-penalty-option" data-minimum-cars-penalty="warning1">
+              <strong>1. Verwarnung</strong>
+              <span>Erste Verwarnung für fehlenden Mindestbestand</span>
+            </button>
+            <button type="button" class="minimum-cars-penalty-option" data-minimum-cars-penalty="warning2">
+              <strong>2. Verwarnung</strong>
+              <span>Zweite Verwarnung für fehlenden Mindestbestand</span>
+            </button>
+            <button type="button" class="minimum-cars-penalty-option money" data-minimum-cars-penalty="money">
+              <strong>50.000 Schwarzgeld</strong>
+              <span>Wird sofort als offene Sanktion im Reiter „Sanktionen“ eingetragen</span>
+            </button>
+            <button type="button" class="minimum-cars-penalty-option minimum-cars-penalty-remove hidden" id="minimumCarsPenaltyRemove">
+              <strong>Strafe entfernen</strong>
+              <span>Entfernt die aktuelle Strafe aus dieser Tageskontrolle.</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="attendance-modal hidden" id="minimumCarsWeekModal">
+        <div class="attendance-modal-backdrop" data-close-minimum-cars-week></div>
+        <div class="attendance-modal-card minimum-cars-week-card">
+          <div class="modal-header minimum-cars-week-header">
+            <div>
+              <div class="eyebrow">MINDESTBESTAND - AUTOS</div>
+              <h2 id="minimumCarsWeekTitle">Wochenansicht</h2>
+            </div>
+            <button class="modal-close" type="button" data-close-minimum-cars-week>×</button>
+          </div>
+
+          <div class="minimum-cars-week-nav">
+            <button class="small-button" type="button" id="minimumCarsWeekPrev">‹ Vorherige</button>
+            <button class="small-button" type="button" id="minimumCarsWeekCurrent">Aktuelle Woche</button>
+            <button class="small-button" type="button" id="minimumCarsWeekNext">Nächste ›</button>
+          </div>
+
+          <div class="minimum-cars-week-legend">
+            <span class="minimum-week-legend-ok">Alles da</span>
+            <span class="minimum-week-legend-missing">Etwas fehlt</span>
+            <span class="minimum-week-legend-open">Nicht geprüft</span>
+          </div>
+
+          <div class="minimum-cars-week-scroll">
+            <div class="minimum-cars-week-grid" id="minimumCarsWeekGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <section class="tab-panel" data-panel="attendance">
+  <div class="section-heading">
+    <div>
+      <div class="section-title">Anwesenheit</div>
+      <div class="section-subtitle">Tägliche Anwesenheit und separate Abwesenheiten im Kalender.</div>
+    </div>
+  </div>
+
+  <div class="attendance-layout">
+    <div class="attendance-list-card">
+      <div class="attendance-card-heading">
+        <div>
+          <div class="section-title">Tagesliste</div>
+          <div class="section-subtitle" id="attendanceTodayLabel"></div>
+        </div>
+        <div class="attendance-header-actions">
+          <button class="small-button" type="button" id="attendanceWeekOverviewButton">Wochenübersicht</button>
+          <button class="small-button" type="button" id="addAttendanceUserButton">＋ Nutzer</button>
+        </div>
+      </div>
+      <div class="attendance-users" id="attendanceUsersList"></div>
+      <div class="form-note">Diese Tagesliste ist unabhängig vom Kalender. Der Status gilt nur für den jeweiligen Tag.</div>
+    </div>
+
+    <div class="attendance-calendar-card">
+      <div class="attendance-card-heading">
+        <div>
+          <div class="section-title">Kalender</div>
+          <div class="section-subtitle">Aktueller Monat · separate Abwesenheiten</div>
+        </div>
+        <div class="calendar-nav">
+          <button class="small-button" type="button" id="attendancePrevMonth">‹</button>
+          <strong id="attendanceMonthTitle"></strong>
+          <button class="small-button" type="button" id="attendanceNextMonth">›</button>
+          <button class="small-button orange-small" type="button" id="attendanceTodayButton">Heute</button>
+          <button class="small-button orange-small" type="button" id="addAbsenceButton">＋ Abwesenheit eintragen</button>
+        </div>
+      </div>
+      <div class="calendar-grid" id="attendanceCalendar"></div>
+      <div class="form-note">Abwesenheiten werden im Kalender als roter Zeitraum mit Grund angezeigt und haben nichts mit der Tagesliste zu tun.</div>
+    </div>
+  </div>
+
+  <div class="attendance-modal hidden" id="absenceModal">
+    <div class="attendance-modal-backdrop" data-close-absence></div>
+    <div class="attendance-modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="eyebrow">ABWESENHEIT</div>
+          <h2>Abwesenheit eintragen</h2>
+        </div>
+        <button class="modal-close" type="button" data-close-absence>×</button>
+      </div>
+      <form id="absenceForm">
+        <div class="field">
+          <label for="absenceUser">Nutzer</label>
+          <select id="absenceUser" required></select>
+        </div>
+        <div class="field">
+          <label for="absenceStart">Von</label>
+          <input id="absenceStart" type="date" required />
+        </div>
+        <div class="field">
+          <label for="absenceEnd">Bis</label>
+          <input id="absenceEnd" type="date" required />
+        </div>
+        <div class="field">
+          <label for="absenceReason">Grund</label>
+          <input id="absenceReason" type="text" maxlength="120" placeholder="z. B. Urlaub, Krankheit, Termin" required />
+        </div>
+        <div class="form-actions-row">
+          <button class="primary-button" type="submit">Abwesenheit speichern</button>
+          <button class="secondary-button" type="button" data-close-absence>Abbrechen</button>
+        </div>
+      </form>
+      <div class="modal-section-title">Eingetragene Abwesenheiten</div>
+      <div class="absence-list" id="absenceList"></div>
+    </div>
+  </div>
+</section>
+    </main>
+
+    <nav class="tabbar" aria-label="Hauptnavigation">
+      <button class="tab-button active" data-tab="stock"><span class="tab-icon">▦</span><span>Bestand</span></button>
+      <button class="tab-button" data-tab="movement"><span class="tab-icon">↕</span><span>Ändern</span></button>
+      <button class="tab-button" data-tab="weekly"><span class="tab-icon">✓</span><span>Wochenabgabe</span></button>
+      <button class="tab-button" data-tab="selling"><span class="tab-icon">◇</span><span>Verkaufen</span></button>
+      <button class="tab-button" data-tab="sanctions"><span class="tab-icon">⚠</span><span>Sanktionen</span></button>
+      <button class="tab-button" data-tab="minimum-cars"><span class="tab-icon">▣</span><span>Mindestbestand - Autos</span></button>
+      <button class="tab-button" data-tab="attendance"><span class="tab-icon">◷</span><span>Anwesenheit</span></button>
+      <button class="tab-button" data-tab="calendar"><span class="tab-icon">▦</span><span>Kalender</span></button>
+      <button class="tab-button" data-tab="members"><span class="tab-icon">♙</span><span>Mitglieder</span></button>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="attendance-month-modal hidden" id="attendanceMonthModal" role="dialog" aria-modal="true" aria-labelledby="attendanceMonthLabel">
+    <div class="attendance-month-backdrop" data-close-attendance-month></div>
+    <div class="attendance-month-card">
+      <div class="attendance-month-header">
+        <div>
+          <div class="eyebrow">ANWESENHEIT</div>
+          <h2 id="attendanceMonthLabel">Aktueller Monat</h2>
+        </div>
+        <button class="modal-close" type="button" id="closeAttendanceMonth" aria-label="Monatsansicht schließen">×</button>
+      </div>
+      <div class="attendance-month-help">Rot = abwesend · Grün = anwesend · Punkt = nicht markiert. Klicke ein Feld, um den Status zu ändern.</div>
+      <div class="attendance-scroll attendance-month-scroll">
+        <div id="attendanceMonthCalendar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="productModal" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="eyebrow">BESTANDSÜBERSICHT</div>
+          <h2 id="productModalTitle">Produkt</h2>
+        </div>
+        <button class="modal-close" type="button" data-close-modal aria-label="Fenster schließen">×</button>
+      </div>
+      <div class="modal-summary" id="productModalSummary"></div>
+      <div class="modal-section-title">Änderungen</div>
+      <div class="modal-list" id="productModalList"></div>
+    </div>
+  </div>
+
+  <script src="app.js?v=1"></script>
+<div class="attendance-modal hidden" id="attendanceUserModal">
+  <div class="attendance-modal-backdrop" data-close-attendance-user></div>
+  <div class="attendance-modal-card">
+    <div class="modal-header">
+      <div>
+        <div class="eyebrow">ANWESENHEIT</div>
+        <h2>Nutzer erstellen</h2>
+      </div>
+      <button class="modal-close" type="button" data-close-attendance-user>×</button>
+    </div>
+    <form id="attendanceUserForm">
+      <div class="field">
+        <label for="attendanceUserName">Name</label>
+        <input id="attendanceUserName" type="text" maxlength="80" placeholder="Name des Nutzers" required />
+      </div>
+      <div class="form-actions-row">
+        <button class="primary-button" type="submit">Nutzer erstellen</button>
+        <button class="secondary-button" type="button" data-close-attendance-user>Abbrechen</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="attendance-modal hidden" id="attendanceUserManageModal">
+  <div class="attendance-modal-backdrop" data-close-attendance-manage></div>
+  <div class="attendance-modal-card attendance-user-manage-card">
+    <div class="modal-header">
+      <div>
+        <div class="eyebrow">ANWESENHEIT</div>
+        <h2 id="manageAttendanceUserTitle">Nutzer</h2>
+      </div>
+      <button class="modal-close" type="button" data-close-attendance-manage>×</button>
+    </div>
+    <div class="attendance-user-manage-actions">
+      <button class="primary-button attendance-edit-user-button" type="button" id="editAttendanceUserButton">✎ Bearbeiten</button>
+      <button class="delete-button attendance-delete-user-button" type="button" id="deleteAttendanceUserButton">🗑 Löschen</button>
+    </div>
+    <div class="form-note">Bearbeiten ändert nur den Namen dieses Anwesenheits-Nutzers. Löschen entfernt auch seine Anwesenheits- und Abwesenheitsdaten.</div>
+  </div>
+</div>
+
+<div class="attendance-modal hidden" id="attendanceWeekOverviewModal">
+  <div class="attendance-modal-backdrop" data-close-attendance-week></div>
+  <div class="attendance-modal-card attendance-week-overview-card">
+    <div class="modal-header">
+      <div>
+        <div class="eyebrow">ANWESENHEIT</div>
+        <h2>Wochenübersicht</h2>
+        <div class="section-subtitle" id="attendanceWeekOverviewLabel"></div>
+      </div>
+      <div class="attendance-week-nav">
+        <button class="small-button" type="button" id="attendanceWeekPrevButton">‹ Vorherige</button>
+        <button class="small-button" type="button" id="attendanceWeekTodayButton">Aktuelle Woche</button>
+        <button class="small-button" type="button" id="attendanceWeekNextButton">Nächste ›</button>
+        <button class="modal-close" type="button" data-close-attendance-week>×</button>
+      </div>
+    </div>
+    <div class="attendance-week-legend">
+      <span class="legend-present">✓ Anwesend</span>
+      <span class="legend-excused">− Abgemeldet</span>
+      <span class="legend-unexcused">! Unabgemeldet</span>
+      <span class="legend-empty">· Nicht markiert</span>
+    </div>
+    <div class="attendance-week-scroll" id="attendanceWeekOverview"></div>
+  </div>
+</div>
+</body>
+</html>

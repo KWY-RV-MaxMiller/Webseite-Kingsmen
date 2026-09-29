@@ -1,0 +1,23 @@
+KINGSMEN – Grundversion
+
+Vercel Environment Variables:
+- SUPABASE_URL
+- SUPABASE_SECRET_KEY
+- ADMIN_PASSWORD
+- MEMBER_PASSWORD
+- SESSION_SECRET
+- APP_URL
+
+Login:
+- ADMIN_PASSWORD = Vollzugriff
+- MEMBER_PASSWORD = eingeschränkter Zugriff wie bisher:
+  Verkaufen, Sanktionen, Mindestbestand-Autos
+  Sanktionen und Mindestbestand bleiben für Mitglieder eingeschränkt/read-only wie im Ausgangssystem.
+
+Discord wurde vollständig aus dem Projekt entfernt.
+Die Standarddaten im Code starten leer bzw. mit Bestand 0.
+Die neue Supabase-app_state-Tabelle sollte für diese neue Webseite verwendet werden.
+
+WICHTIG:
+Wenn in der neuen Supabase-Tabelle app_state bereits alte Daten stehen, diese vor dem ersten produktiven Einsatz auf {} zurücksetzen.
+Bei einer frisch angelegten Tabelle mit {} startet die Seite leer.
