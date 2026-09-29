@@ -78,10 +78,15 @@ module.exports=async function handler(req,res){
         });
       }
 
+      const persisted=await readState();
+      if(!persisted.state){
+        return res.status(500).json({error:'Supabase hat den Zustand nicht dauerhaft gespeichert.'});
+      }
+
       return res.status(200).json({
         ok:true,
-        state:rows?.[0]?.state||state,
-        updatedAt:rows?.[0]?.updated_at||updatedAt
+        state:persisted.state,
+        updatedAt:persisted.updatedAt||updatedAt
       });
     }
     return res.status(405).json({error:'Methode nicht erlaubt'});
