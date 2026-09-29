@@ -848,7 +848,7 @@ let canEditCalendar=false;
 
 function isLimitedAccess(){ return currentAccess==='limited'; }
 function isCalendarOnlyAccess(){ return false; }
-function canSeeCalendar(){ return currentAccess==='full'; }
+function canSeeCalendar(){ return currentAccess==='full' || currentAccess==='limited'; }
 
 function limitedReadOnlyGuard(area){
   if(!isLimitedAccess()) return false;
@@ -858,14 +858,14 @@ function limitedReadOnlyGuard(area){
 
 function applyAccessUi(){
   const allowed=currentAccess==='limited'
-      ? new Set(['selling','sanctions','minimum-cars'])
+      ? new Set(['selling','sanctions','minimum-cars','calendar'])
       : null;
   document.querySelectorAll('.tab-button').forEach(btn=>{
     btn.hidden=!!allowed && !allowed.has(btn.dataset.tab);
   });
   document.body.classList.toggle('limited-access',isLimitedAccess());
   const calendarTab=document.querySelector('.tab-button[data-tab="calendar"]');
-  if(calendarTab) calendarTab.hidden=currentAccess!=='full';
+  if(calendarTab) calendarTab.hidden=false;
 
   if(isLimitedAccess()){
     const catalogEdit=$('sanctionCatalogEditButton');
@@ -879,7 +879,7 @@ function applyAccessUi(){
 }
 
 function setTab(tab) {
-  const allowedTabs=currentAccess==='limited' ? ['selling','sanctions','minimum-cars'] : null;
+  const allowedTabs=currentAccess==='limited' ? ['selling','sanctions','minimum-cars','calendar'] : null;
   if(allowedTabs && !allowedTabs.includes(tab)) tab='selling';
   document.querySelectorAll('.tab-button').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
   document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.toggle('active', panel.dataset.panel === tab));
