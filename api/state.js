@@ -1,6 +1,13 @@
 const {readSession}=require('./_auth');
+function supabaseRestBase(){
+  let base=String(process.env.SUPABASE_URL || '').trim();
+  base=base.replace(/^['"]|['"]$/g,'').replace(/\/+$/,'');
+  base=base.replace(/\/rest\/v1$/i,'');
+  if(!/^https?:\/\//i.test(base)) throw new Error('SUPABASE_URL ist ungültig');
+  return `${base}/rest/v1`;
+}
 async function sb(path,options={}){
-  const r=await fetch(`${process.env.SUPABASE_URL}/rest/v1/${path}`,{
+  const r=await fetch(`${supabaseRestBase()}/${String(path).replace(/^\/+/, '')}`,{
     ...options,
     headers:{
       apikey:process.env.SUPABASE_SECRET_KEY,
