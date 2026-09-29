@@ -3662,7 +3662,7 @@ body:has(.tab-panel[data-panel="sanctions"].active){
   margin-top:4px !important;
   padding-top:4px;
   border-top:1px solid rgba(255,255,255,.08);
-  color:#ffb15a;
+  color:#74baff;
   font-weight:800;
   line-height:1.2;
 }
@@ -4039,7 +4039,7 @@ input,select,textarea{accent-color:var(--orange)}
 .field input:focus,.field select:focus,.calendar-form input:focus,.calendar-form select:focus,.calendar-form textarea:focus,textarea:focus{
   border-color:rgba(22,140,255,.82)!important;box-shadow:0 0 0 3px rgba(22,140,255,.11)!important
 }
-.primary-button,.action-button.orange{background:linear-gradient(180deg,#ff8b1b,#ff7200);color:#160b02;box-shadow:0 10px 28px rgba(22,140,255,.17)}
+.primary-button,.action-button.orange{background:linear-gradient(180deg,#3da4ff,#168cff);color:#160b02;box-shadow:0 10px 28px rgba(22,140,255,.17)}
 .secondary-button,.action-button.dark,.delete-button,.modal-close{background:#171719;border-color:#343439;color:#d7d7db}
 
 /* Alle Untermenüs/Modals im selben Theme + Hintergrundschrift */
@@ -4214,7 +4214,7 @@ body::after{
   opacity:.46;
   background:
     linear-gradient(166deg,transparent 0 39%,rgba(113,34,0,.10) 39.5% 40.5%,transparent 41% 100%),
-    linear-gradient(173deg,transparent 0 56%,rgba(255,83,0,.055) 56.5% 58%,transparent 58.5% 100%),
+    linear-gradient(173deg,transparent 0 56%,rgba(22,140,255,.055) 56.5% 58%,transparent 58.5% 100%),
     radial-gradient(ellipse at 57% 63%,rgba(255,76,0,.105),transparent 39%);
   filter:blur(.15px);
 }
@@ -4235,7 +4235,7 @@ body::after{
   letter-spacing:-.09em !important;
   white-space:nowrap !important;
   color:rgba(171,55,0,.155) !important;
-  text-shadow:0 0 42px rgba(255,83,0,.065) !important;
+  text-shadow:0 0 42px rgba(22,140,255,.065) !important;
   pointer-events:none !important;
   user-select:none !important;
   mix-blend-mode:screen;
@@ -4272,7 +4272,7 @@ body::after{
    KINGSMEN — unified reference look (all tabs / dialogs)
    ========================================================= */
 :root{
-  --le-orange:#ff6a00;
+  --le-orange:#168cff;
   --le-orange-2:#168cff;
   --le-orange-dark:#7b2800;
   --le-bg:#070708;
@@ -4343,7 +4343,7 @@ input,select,textarea,.select-trigger,.date-trigger{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
 }
 input:focus,select:focus,textarea:focus,.select-trigger:focus,.date-trigger:focus{
-  outline:none!important;border-color:var(--le-orange)!important;box-shadow:0 0 0 1px rgba(255,106,0,.25),0 0 18px rgba(255,83,0,.08)!important;
+  outline:none!important;border-color:var(--le-orange)!important;box-shadow:0 0 0 1px rgba(22,140,255,.25),0 0 18px rgba(22,140,255,.08)!important;
 }
 
 /* buttons */
@@ -4351,7 +4351,7 @@ button,.button,.primary-button,.add-button,.save-button{
   border-radius:9px!important;font-weight:800!important;
 }
 .primary-button,.add-button,.save-button,button.primary{
-  color:#090909!important;background:linear-gradient(180deg,#ff7b12,#ff6500)!important;
+  color:#090909!important;background:linear-gradient(180deg,#2f9cff,#168cff)!important;
   border:1px solid #168cff!important;box-shadow:0 8px 22px rgba(255,87,0,.12)!important;
 }
 .secondary-button,.ghost-button,.modal-close,.cancel-button{
@@ -4368,14 +4368,14 @@ button,.button,.primary-button,.add-button,.save-button{
 .tab-button:hover{background:rgba(255,255,255,.025)!important;color:#f1f1f2!important}
 .tab-button.active{
   color:#168cff!important;background:linear-gradient(90deg,rgba(255,91,0,.18),rgba(255,91,0,.07))!important;
-  border-color:#ff6a00!important;box-shadow:inset 3px 0 0 #ff6a00,0 0 24px rgba(255,81,0,.08)!important;
+  border-color:#168cff!important;box-shadow:inset 3px 0 0 #168cff,0 0 24px rgba(22,140,255,.08)!important;
 }
 
 /* All modal / submenu surfaces */
 .attendance-modal-backdrop{background:rgba(0,0,0,.62)!important;backdrop-filter:blur(2px)!important}
 .attendance-modal-card,.modal-card,.dialog-card{
   background:linear-gradient(180deg,rgba(17,17,18,.97),rgba(10,10,11,.97))!important;
-  border:1px solid rgba(255,106,0,.60)!important;border-radius:18px!important;
+  border:1px solid rgba(22,140,255,.60)!important;border-radius:18px!important;
   box-shadow:0 28px 80px rgba(0,0,0,.68),0 0 34px rgba(255,85,0,.08),inset 0 1px 0 rgba(255,255,255,.035)!important;
 }
 .modal-header,.modal-title-row{border-color:rgba(255,255,255,.08)!important}
@@ -4385,18 +4385,18 @@ button,.button,.primary-button,.add-button,.save-button{
 .calendar-grid>* ,.calendar-week-grid>*{border-color:rgba(255,255,255,.10)!important}
 .calendar-day,.calendar-cell,.calendar-slot{background:rgba(8,8,9,.52)!important}
 .calendar-day:hover,.calendar-cell:hover,.calendar-slot:hover{background:rgba(255,100,0,.045)!important}
-.calendar-event{border:1px solid rgba(255,106,0,.72)!important;background:linear-gradient(135deg,rgba(255,106,0,.25),rgba(89,28,0,.30))!important;box-shadow:0 7px 20px rgba(0,0,0,.25)!important}
+.calendar-event{border:1px solid rgba(22,140,255,.72)!important;background:linear-gradient(135deg,rgba(22,140,255,.25),rgba(89,28,0,.30))!important;box-shadow:0 7px 20px rgba(0,0,0,.25)!important}
 
 /* custom date picker */
 .custom-datepicker,.date-picker,.calendar-picker,.datepicker-popover{
   background:linear-gradient(180deg,#202022,#18181a)!important;border:1px solid rgba(255,255,255,.30)!important;
   border-radius:10px!important;box-shadow:0 18px 45px rgba(0,0,0,.55)!important;color:#fff!important;
 }
-.datepicker-day:hover,.date-day:hover{background:rgba(255,106,0,.18)!important}
-.datepicker-day.selected,.date-day.selected,.datepicker-day.today{background:#ff6a00!important;color:#080808!important;font-weight:900!important}
+.datepicker-day:hover,.date-day:hover{background:rgba(22,140,255,.18)!important}
+.datepicker-day.selected,.date-day.selected,.datepicker-day.today{background:#168cff!important;color:#080808!important;font-weight:900!important}
 
 /* consistent orange outlines for focused / important areas */
-.calendar-modal-card,.attendance-modal-card:focus-within{border-color:rgba(255,106,0,.55)!important}
+.calendar-modal-card,.attendance-modal-card:focus-within{border-color:rgba(22,140,255,.55)!important}
 
 @media(max-width:820px){
   body::after{left:0!important}
@@ -4472,11 +4472,11 @@ button,.button,.primary-button,.add-button,.save-button{
 /* Intentional orange hover/focus instead of white outlines. */
 .product-card:hover,.sell-product-card:hover,.minimum-car-card:hover,.member-card:hover,
 .person-card:hover,.attendance-user-row:hover,.activity-item:hover {
-  border-color: rgba(255,106,0,.48) !important;
+  border-color: rgba(22,140,255,.48) !important;
   box-shadow: 0 12px 34px rgba(0,0,0,.30), 0 0 18px rgba(255,88,0,.10) !important;
 }
 .product-card-button:focus-visible,button:focus-visible,a:focus-visible {
-  outline: 2px solid rgba(255,106,0,.72) !important;
+  outline: 2px solid rgba(22,140,255,.72) !important;
   outline-offset: 2px !important;
 }
 
@@ -4494,7 +4494,7 @@ button,.button,.primary-button,.add-button,.save-button{
   color:var(--att-name-1, #168cff);
   background:linear-gradient(110deg,
     var(--att-name-1, #168cff) 0%,
-    var(--att-name-2, #ffb15a) 26%,
+    var(--att-name-2, #74baff) 26%,
     #fff 43%,
     var(--att-name-3, #a83b00) 58%,
     var(--att-name-1, #168cff) 100%);
@@ -4502,7 +4502,7 @@ button,.button,.primary-button,.add-button,.save-button{
   -webkit-background-clip:text;
   background-clip:text;
   -webkit-text-fill-color:transparent;
-  text-shadow:0 0 14px var(--att-name-glow, rgba(255,106,0,.28));
+  text-shadow:0 0 14px var(--att-name-glow, rgba(22,140,255,.28));
   animation:attendanceNameFlow 3.8s ease-in-out infinite !important;
 }
 
@@ -4512,7 +4512,7 @@ button,.button,.primary-button,.add-button,.save-button{
   50% { border-color:rgba(126,39,0,.95); box-shadow:0 0 0 1px rgba(126,39,0,.12),0 0 25px rgba(194,57,0,.25); }
 }
 @keyframes leButtonBreath {
-  0%,100% { background:linear-gradient(180deg,#ff821c,#ff6900); box-shadow:0 8px 24px rgba(255,95,0,.18); }
+  0%,100% { background:linear-gradient(180deg,#3da4ff,#168cff); box-shadow:0 8px 24px rgba(22,140,255,.18); }
   50% { background:linear-gradient(180deg,#b84500,#7e2900); box-shadow:0 8px 30px rgba(139,43,0,.32); }
 }
 @keyframes leAccentTextBreath {
@@ -4542,10 +4542,10 @@ input,select,textarea,.select-trigger,.date-trigger {
   border-color:rgba(255,255,255,.12) !important;
 }
 input:hover,select:hover,textarea:hover,.select-trigger:hover,.date-trigger:hover {
-  border-color:rgba(255,106,0,.28) !important;
+  border-color:rgba(22,140,255,.28) !important;
 }
 input:focus,select:focus,textarea:focus,.select-trigger:focus,.date-trigger:focus {
-  border-color:#ff6a00 !important;
+  border-color:#168cff !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4566,3 +4566,9 @@ input:focus,select:focus,textarea:focus,.select-trigger:focus,.date-trigger:focu
 .password-login-button{width:100%;border:0;border-radius:14px;padding:14px 16px;background:linear-gradient(180deg,#2f9cff,#168cff);color:#06111d;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 12px 28px rgba(22,140,255,.22)}
 .password-login-button:hover{filter:brightness(1.08)}
 .password-login-button:disabled{opacity:.65;cursor:wait}
+
+/* KINGSMEN V2 – alle Login-Akzente sicher blau */
+.password-login-form input:focus{
+  border-color:#168cff !important;
+  box-shadow:0 0 0 1px rgba(22,140,255,.28),0 0 18px rgba(22,140,255,.10) !important;
+}
