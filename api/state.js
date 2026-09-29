@@ -60,11 +60,24 @@ module.exports=async function handler(req,res){
       }
 
       const updatedAt=new Date().toISOString();
-      const rows=await sb('app_state?on_conflict=id',{
-        method:'POST',
-        headers:{Prefer:'resolution=merge-duplicates,return=representation'},
-        body:JSON.stringify({id:1,state,updated_at:updatedAt})
+
+      // app_state row id=1 already exists. Updating that exact row is more robust
+      // with Supabase's newer sb_secret_... server keys than an upsert URL.
+      let rows=await sb('app_state?id=eq.1',{
+        method:'PATCH',
+        headers:{Prefer:'return=representation'},
+        body:JSON.stringify({state,updated_at:updatedAt})
       });
+
+      // Safety fallback in case the row was accidentally deleted.
+      if(!Array.isArray(rows) || !rows.length){
+        rows=await sb('app_state',{
+          method:'POST',
+          headers:{Prefer:'return=representation'},
+          body:JSON.stringify({id:1,state,updated_at:updatedAt})
+        });
+      }
+
       return res.status(200).json({
         ok:true,
         state:rows?.[0]?.state||state,
