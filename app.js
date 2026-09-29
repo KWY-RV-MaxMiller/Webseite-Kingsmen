@@ -405,6 +405,16 @@ async function saveData(immediate = false) {
           lastCloudUpdatedAt = result.updatedAt || expectedUpdatedAt;
           data = normalizeData(result.state || localToSave);
           lastSyncedData = cloneJson(data);
+
+          // Confirm that Supabase really persisted the write before reporting success.
+          const verify = await apiFetch(`/api/state?load=${Date.now()}`);
+          const verified = normalizeData(verify.state || defaultData);
+          if (JSON.stringify(verified) !== JSON.stringify(data)) {
+            throw new Error('Supabase hat die Änderung nicht dauerhaft gespeichert.');
+          }
+          data = verified;
+          lastCloudUpdatedAt = verify.updatedAt || lastCloudUpdatedAt;
+          lastSyncedData = cloneJson(verified);
           renderCloudSyncedViews();
           return;
         } catch (error) {
@@ -3683,3 +3693,12 @@ $('attendanceMonthModal').addEventListener('click', event => {
 });
 window.addEventListener('keydown', event => { if (event.key === 'Escape') closeAttendanceMonth(); });
 
+
+// KINGSMEN V6: offene Debounce-Speicherung beim Verlassen sofort anstoßen.
+window.addEventListener('pagehide',()=>{
+  if(cloudReady && saveTimer){
+    clearTimeout(saveTimer);
+    saveTimer=null;
+    saveData(true);
+  }
+});
