@@ -363,18 +363,25 @@ async function pullCloudData() {
   }
 }
 
-function startCloudSync() {
-  clearInterval(syncTimer);
+function startCloudSync(){
+  // Kein 1-Sekunden-Polling mehr.
+  // Aktualisiert wird nur bei tatsächlichen Änderungen (BroadcastChannel)
+  // sowie beim Zurückkehren/Fokussieren des Fensters als Sicherheitsabgleich.
+  if(window.__kingsmenSyncStarted) return;
+  window.__kingsmenSyncStarted=true;
 
-  // Direkt einmal prüfen und danach jede Sekunde nur den Zeitstempel abfragen.
-  // Der komplette State wird ausschließlich bei einer tatsächlichen Änderung geladen.
-  pullCloudData();
-  syncTimer = setInterval(pullCloudData, 1000);
-
-  window.addEventListener('focus', pullCloudData);
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) pullCloudData();
+  window.addEventListener('focus',()=>pullCloudData());
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') pullCloudData();
   });
+
+  if('BroadcastChannel' in window){
+    const channel=new BroadcastChannel('kingsmen-state-v1');
+    window.__kingsmenStateChannel=channel;
+    channel.addEventListener('message',event=>{
+      if(event.data?.type==='state-changed') pullCloudData();
+    });
+  }
 }
 
 async function saveData(immediate = false) {
@@ -416,6 +423,15 @@ async function saveData(immediate = false) {
           lastCloudUpdatedAt = verify.updatedAt || lastCloudUpdatedAt;
           lastSyncedData = cloneJson(verified);
           renderCloudSyncedViews();
+
+          // Andere offene Kingsmen-Fenster sofort über eine echte Änderung informieren.
+          try{
+            window.__kingsmenStateChannel?.postMessage({
+              type:'state-changed',
+              updatedAt:lastCloudUpdatedAt
+            });
+          }catch(_){}
+
           return;
         } catch (error) {
           if (error.status !== 409 || !error.payload?.state) throw error;
