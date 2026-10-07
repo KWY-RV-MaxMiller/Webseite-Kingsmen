@@ -3992,7 +3992,7 @@ body::before{
 .header-badge{border:1px solid rgba(22,140,255,.45);background:#14100d;color:var(--orange-2);box-shadow:0 0 30px rgba(22,140,255,.08)}
 .content{position:relative;padding:24px 0 0;isolation:isolate;min-height:calc(100vh - 138px)}
 .content::before{
-  content:"KINGSMEN";position:fixed;z-index:-2;left:calc(242px + 50%);top:55%;transform:translate(-50%,-50%) rotate(-14deg);
+  content:"KINGSMAN";position:fixed;z-index:-2;left:calc(242px + 50%);top:55%;transform:translate(-50%,-50%) rotate(-14deg);
   font-size:clamp(100px,16vw,250px);line-height:.8;font-weight:1000;letter-spacing:-.085em;white-space:nowrap;
   color:rgba(178,65,0,.095);text-shadow:0 0 50px rgba(255,92,0,.045);pointer-events:none;user-select:none;
 }
@@ -4017,7 +4017,7 @@ body::before{
   filter:drop-shadow(0 0 14px rgba(22,140,255,.18));
 }
 .tabbar::after{
-  content:"KINGSMEN";position:fixed;left:105px;top:42px;color:#2798ff;font-size:15px;font-weight:950;letter-spacing:.08em;white-space:nowrap;
+  content:"KINGSMAN";position:fixed;left:105px;top:42px;color:#2798ff;font-size:15px;font-weight:950;letter-spacing:.08em;white-space:nowrap;
 }
 .tab-button{
   flex:0 0 auto;width:100%;min-height:48px;display:flex;align-items:center;justify-content:flex-start;gap:13px;
@@ -4049,7 +4049,7 @@ input,select,textarea{accent-color:var(--orange)}
   position:relative;overflow:auto;background:linear-gradient(145deg,rgba(20,20,22,.99),rgba(10,10,11,.995));border:1px solid rgba(22,140,255,.28);box-shadow:0 28px 90px rgba(0,0,0,.66),0 0 50px rgba(255,98,0,.035)
 }
 .modal-card::before,.attendance-modal-card::before,#calendarModal .calendar-modal-card::before{
-  content:"KINGSMEN";position:absolute;z-index:-1;left:50%;top:54%;transform:translate(-50%,-50%) rotate(-14deg);
+  content:"KINGSMAN";position:absolute;z-index:-1;left:50%;top:54%;transform:translate(-50%,-50%) rotate(-14deg);
   font-size:clamp(58px,10vw,125px);font-weight:1000;letter-spacing:-.08em;white-space:nowrap;color:rgba(178,65,0,.075);pointer-events:none
 }
 .modal-header{position:relative;z-index:2}.modal-header h2{font-weight:900}
@@ -4223,7 +4223,7 @@ body::after{
 
 /* Großes dunkeloranges KINGSMEN-Wasserzeichen über die freie Fläche. */
 .content::before{
-  content:"KINGSMEN" !important;
+  content:"KINGSMAN" !important;
   position:fixed !important;
   z-index:-1 !important;
   left:calc(242px + (100vw - 242px)/2) !important;
