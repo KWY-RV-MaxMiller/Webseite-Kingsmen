@@ -10,8 +10,9 @@ async function sb(path,options={}){
   const r=await fetch(`${supabaseRestBase()}/${String(path).replace(/^\/+/, '')}`,{
     ...options,
     headers:{
+      // Supabase sb_secret_... is an API key, not a JWT. Send it via apikey;
+      // do not put it in Authorization: Bearer, which can override the API-key role.
       apikey:process.env.SUPABASE_SECRET_KEY,
-      Authorization:`Bearer ${process.env.SUPABASE_SECRET_KEY}`,
       'Content-Type':'application/json',
       ...(options.headers||{})
     }
